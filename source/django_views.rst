@@ -13,22 +13,26 @@ l'ensemble des résultats du sondage.
 Ouvrons le fichier ``urls.py`` une nouvelle fois et ajoutons quatre nouvelles
 entrées::
 
-  url(r'^polls/$', 'polls.views.index'),
-  url(r'^polls/(?P<poll_id>\d+)/$', 'polls.views.detail'),
-  url(r'^polls/(?P<poll_id>\d+)/results/$', 'polls.views.results'),
-  url(r'^polls/(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
+  url(r'^polls/$', views.index),
+  url(r'^polls/(?P<poll_id>\d+)/$', views.detail),
+  url(r'^polls/(?P<poll_id>\d+)/results/$', views.results),
+  url(r'^polls/(?P<poll_id>\d+)/vote/$', views.vote),
+
+Nous allons également rajouter une règle pour importer les views ::
+
+    from polls import views
 
 Finalement, le fichier devrait ressembler à::
 
   from django.conf.urls import include, url
-
   from django.contrib import admin
+  from polls import views
 
   urlpatterns = [
-      url(r'^polls/$', 'polls.views.index'),
-      url(r'^polls/(?P<poll_id>\d+)/$', 'polls.views.detail'),
-      url(r'^polls/(?P<poll_id>\d+)/results/$', 'polls.views.results'),
-      url(r'^polls/(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
+      url(r'^polls/$', views.index),
+      url(r'^polls/(?P<poll_id>\d+)/$', views.detail),
+      url(r'^polls/(?P<poll_id>\d+)/results/$', views.results),
+      url(r'^polls/(?P<poll_id>\d+)/vote/$', views.vote),
       url(r'^admin/', include(admin.site.urls)),
   ]
 
@@ -353,7 +357,7 @@ Corrigez la fonction ``vote`` function, comme suit::
         selected_choice.votes += 1
         selected_choice.save()
         # Redirige un utilisateur à la vue détaillée du sondage, sur laquelle il ou elle vient de voter
-       return HttpResponseRedirect(reverse('polls.views.results', args=(p.id,)))
+        return HttpResponseRedirect(reverse(results, args=(p.id,))
 
 Dans la vue il y a un ensemble de nouvelles idées que nous n'avons pas encore
 détaillées.
@@ -381,6 +385,8 @@ ou simplement en rafraîchissant la page (en appuyant sur F5). En résumé,
 après que le formulaire correct est soumis (dans ce cas, après le vote à un
 sondage), nous devons effectuer une redirection en utilisant
 ``HttpResponseRedirect``.
+
+Pour trouver le chemin pour accéder à la vue ``results``, on peut utiliser la fonction ``reverse`` en lui passant la fonction en premier paramètre.
 
 À la fin nous devons encore développer une vue pour les résultats du sondage,
 affichés après un vote.
@@ -461,7 +467,7 @@ utilisateurs à faire de même.
             selected_choice.votes += 1
             selected_choice.save()
             # Redirige l'utilisateur à la vue détaillée du sonage sur laquelle il/elle vient de voter
-            return HttpResponseRedirect(reverse('polls.views.results', args=(p.id,)))
+            return HttpResponseRedirect(reverse('results', args=(p.id,)))
 
 .. admonition:: ``urls.py``
    :class: alert alert-hidden
@@ -474,10 +480,10 @@ utilisateurs à faire de même.
         admin.autodiscover()
 
         urlpatterns = patterns('',
-          url(r'^polls/$', 'polls.views.index'),
-          url(r'^polls/(?P<poll_id>\d+)/$', 'polls.views.detail'),
-          url(r'^polls/(?P<poll_id>\d+)/results/$', 'polls.views.results'),
-          url(r'^polls/(?P<poll_id>\d+)/vote/$', 'polls.views.vote'),
+          url(r'^polls/$', views.index),
+          url(r'^polls/(?P<poll_id>\d+)/$', views.detail),
+          url(r'^polls/(?P<poll_id>\d+)/results/$', views.results),
+          url(r'^polls/(?P<poll_id>\d+)/vote/$', views.vote),
           url(r'^admin/', include(admin.site.urls)),
         )
 
